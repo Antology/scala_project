@@ -61,12 +61,21 @@ object Model {
   }
 
   sealed trait Continent
-  case object NA extends Continent
-  case object SA extends Continent
-  case object EU extends Continent
-  case object AS extends Continent
-  case object AF extends Continent
-  case object OC extends Continent
+  object Continent {
+
+    case object NA extends Continent
+
+    case object SA extends Continent
+
+    case object EU extends Continent
+
+    case object AS extends Continent
+
+    case object AF extends Continent
+
+    case object OC extends Continent
+
+  }
 
   sealed trait CountryWikilink
 
