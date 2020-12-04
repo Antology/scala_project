@@ -23,9 +23,25 @@ object Airport {
           }
         }
 
-  final case class AirportType private(string: String)
+  sealed trait AirportType
       object AirportType{
-        def build(string: String) = Some(AirportType(string))
+        case object Heliport extends AirportType
+        case object SmallAirport extends AirportType
+        case object SeaplaneBase extends AirportType
+        case object Balloonport extends AirportType
+        case object Closed extends AirportType
+        case object MediumAirport extends AirportType
+        case object LargeAirport extends AirportType
+        def build(string: String) = string match {
+          case "heliport" => Some(Heliport)
+          case "small_airport" => Some(SmallAirport)
+          case "seaplane_base" => Some(SeaplaneBase)
+          case "balloonport" => Some(Balloonport)
+          case "closed" => Some(Closed)
+          case "medium_airport" => Some(MediumAirport)
+          case "large_airport" => Some(LargeAirport)
+        }
+
       }
 
   final case class AirportName private(string: String)

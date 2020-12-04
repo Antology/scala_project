@@ -1,4 +1,4 @@
-import fp.model.{Airport, Country}
+import fp.model.{Airport, Country, Runway}
 
 import scala.io.Source
 import org.mongodb.scala._
