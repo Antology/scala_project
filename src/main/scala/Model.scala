@@ -47,23 +47,6 @@
 
 
 
-
-
-
-  sealed trait AirportName
-
-  sealed trait AirportLatitudeDeg
-
-  sealed trait AirportLongitudeDeg
-
-  sealed trait AirportElevationFt
-
-  sealed trait AirportIsoCountry
-
-  sealed trait AirportIsoRegion
-
-  sealed trait AirportMunicipality
-
   sealed trait AirportScheduledService
   case object AirportYes extends AirportScheduledService
   case object AirportNo extends AirportScheduledService
