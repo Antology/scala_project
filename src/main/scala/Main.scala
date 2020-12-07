@@ -5,32 +5,43 @@ import org.mongodb.scala._
 
 
 object Main extends App {
+  print()
   val mongoClient: MongoClient = MongoClient("mongodb://localhost")
-  val data_airport = Source.fromFile("resources/airports.csv").getLines
+  val runway_file = "resources/runways.csv"
+  val airport_file = "resources/airports.csv"
+  val coutry_file = "resources/countries.csv"
+  def parse_airport(string: String)= {
+    val data_airport = Source.fromFile(string).getLines
     data_airport.drop(1)
-    data_airport.foreach{
-    line =>
-      println(line)
-      val columns = line.split(";")
-      val airport = Airport.fromStrings(columns)
-      println(airport)
+    data_airport.foreach {
+      line =>
+        println(line)
+        val columns = line.split(";")
+        val airport = Airport.fromStrings(columns)
+        println(airport)
+    }
   }
-  val data_country = Source.fromFile("resources/countries.csv").getLines
-  data_country.drop(1)
-  data_country.foreach{
-    line =>
-      println(line)
-      val columns = line.split(";")
-      val country = Country.fromStrings(columns)
-      println(country)
+  def parse_country(string: String)= {
+    val data_country = Source.fromFile(string).getLines
+    data_country.drop(1)
+    data_country.foreach {
+      line =>
+        println(line)
+        val columns = line.split(";")
+        val country = Country.fromStrings(columns)
+        println(country)
+    }
   }
-  val data_runway = Source.fromFile("resources/runways.csv").getLines
-  data_runway.drop(1)
-  data_runway.foreach{
-    line =>
-      println(line)
-      val columns = line.split(";")
-      val runway = Runway.fromStrings(columns)
-      println(runway)
+  def parse_runways(string: String) = {
+    val data_runway = Source.fromFile(string).getLines
+    data_runway.drop(1)
+    data_runway.foreach {
+      line =>
+        println(line)
+        val columns = line.split(";")
+        val runway = Runway.fromStrings(columns)
+        println(runway)
+    }
+
   }
 }
