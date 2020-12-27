@@ -1,6 +1,7 @@
 package fp.model
 import fp.model.Airport.{AirportID, AirportIdent, AirportType}
 
+
 case class Airport private (id:AirportID,airportIdent:AirportIdent,airportType:AirportType,airportName: String)
 
 object Airport {
@@ -47,8 +48,8 @@ object Airport {
       }
 
 
-  def fromStrings (strs:Array[String]):Either[String,Airport]={ //si liste contient 1 element L, si AirportID.build(L) renvoie une instance A d'AirportID, alors je renvoie Airport(A){
-    if (strs.size == 4) {
+  def fromStrings (strs:Array[String]):Either[String,Airport]={
+
       val airportID = AirportID.build(strs(0).map(_.asDigit).toList).toOption
       val airportIdent = AirportIdent.build(strs(1).toList).toOption
       val airportName = strs(3)
@@ -57,36 +58,13 @@ object Airport {
 
       (airportID, airportIdent,airportType,airportName) match {
         case (Some(id), Some(ident),Some(typ),name) => Right(Airport(id, ident, typ, name))
-        //case (None, None) => Left("id and ident non valide")
-        //case (None, Some(ident)) => Left(s"Airport (ident:$ident) -> id non valide")
-        //case (Some(id), None) => Left(s"Airport (id:$id) -> ident non valide")
+        case _ => Left("Error")
       }
-    }
-    else {Left(s"${strs.mkString(";")} ne contient pas assez d'éléments pour construire un aéroport")}
+
+
   }
 }
 
-//Simplifier avec "For comprehension"
-//Dans case classe airport, le champ name de type AirportName => Option[AirportName]
-
-
-/* def fromStrings (strs:Array[String]):Either[String,Airport]={ //si liste contient 1 element L, si AirportID.build(L) renvoie une instance A d'AirportID, alors je renvoie Airport(A){
-    if (strs.size == 4) {
-      val airportID = AirportID.build(strs(0).map(_.asDigit).toList).toOption
-      val airportIdent = AirportIdent.build(strs(1).toList).toOption
-      val airportName = strs(3)
-
-
-      (airportID, airportIdent) match {
-        case (Some(id), Some(ident)) => Right(Airport(id, ident, null, null))
-        case (None, None) => Left("id and ident non valide")
-        case (None, Some(ident)) => Left(s"Airport (ident:$ident) -> id non valide")
-        case (Some(id), None) => Left(s"Airport (id:$id) -> ident non valide")
-      }
-    }
-    else {Left(s"${strs.mkString(";")} ne contient pas assez d'éléments pour construire un aéroport")}
-  }
-}*/
 
 
 
