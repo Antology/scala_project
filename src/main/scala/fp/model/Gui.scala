@@ -6,7 +6,7 @@ class Menu extends MainFrame {
   preferredSize = new Dimension(500, 500)
   contents = new BoxPanel(Orientation.Vertical) {
     contents += new Label("Welcome to AirViewer !")
-    contents += Button("Begin") { GuiProgramOne.toSelBoard();Menu.this.visible = false }
+    contents += Button("Begin") { Gui.toSelBoard();Menu.this.visible = false }
     contents += Button("Close") { sys.exit(0) }
     border = Swing.EmptyBorder(125, 125, 125, 125)
   }
@@ -23,7 +23,7 @@ class SelBoard extends MainFrame {
   }
 }
 
-object GuiProgramOne {
+object Gui {
   def display() {
     val ui1 = new Menu
     ui1.visible = true

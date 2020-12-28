@@ -21,9 +21,11 @@ object Main extends App {
     val create_airport =
       sql"""
     CREATE TABLE public.airport (
-      id   SERIAL,
-      name VARCHAR NOT NULL UNIQUE,
-      age  SMALLINT)""".update.run
+      number   SERIAL,
+      id VARCHAR,
+      ident VARCHAR,
+      type  VARCHAR,
+      name VARCHAR )""".update.run
 
     val drop_country =
       sql"""DROP TABLE IF EXISTS public.country""".update.run
@@ -53,19 +55,25 @@ object Main extends App {
 
   val runway_file = "resources/runways.csv"
   val airport_file = "resources/airports.csv"
-  val coutry_file = "resources/countries.csv"
+  val country_file = "resources/countries.csv"
 
-  def parseCsvFile[A](fileName: String, parser: Array[String] => Either[String, A]) = {
-    val data = Source.fromFile(fileName).getLines().drop(1).foreach {
-      line =>
+  def parseCsvFile[A](fileName: String, parser: Array[String] => Either[String, A], toSqlStr : A =>Fragment) = {
+    Source.fromFile(fileName)
+      .getLines()
+      .drop(1)
+      .foreach { line =>
         val columns = line.split(";")
-        val parse = parser(columns)
+        val parsed = parser(columns)
+        parsed match {
+          case Left(parsed) => println("Error: "+parsed)
+          case Right(airport)=>{toSqlStr(airport).update.run.transact(xa).unsafeRunSync()}
+        }
     }
   }
   Create_tables()
-  parseCsvFile(airport_file,Airport.fromStrings)
-  parseCsvFile(runway_file,Runway.fromStrings)
-  parseCsvFile(coutry_file,Country.fromStrings)
-  fp.model.GuiProgramOne.display()
+  parseCsvFile(airport_file,Airport.fromStrings,Airport.toSqlStr)
+  //parseCsvFile(runway_file,Runway.fromStrings)
+  //parseCsvFile(country_file,Country.fromStrings)
+  fp.model.Gui.display()
   }
 

@@ -1,4 +1,9 @@
 package fp.model
+import doobie._
+import doobie.implicits._
+import cats.effect.IO
+import cats.implicits.catsSyntaxTuple2Semigroupal
+import doobie.util.fragment
 import fp.model.Airport.{AirportID, AirportIdent, AirportType}
 
 
@@ -52,9 +57,8 @@ object Airport {
 
       val airportID = AirportID.build(strs(0).map(_.asDigit).toList).toOption
       val airportIdent = AirportIdent.build(strs(1).toList).toOption
-      val airportName = strs(3)
       val airportType = AirportType.build(strs(2)).toOption
-
+      val airportName = strs(3)
 
       (airportID, airportIdent,airportType,airportName) match {
         case (Some(id), Some(ident),Some(typ),name) => Right(Airport(id, ident, typ, name))
@@ -62,6 +66,13 @@ object Airport {
       }
 
 
+  }
+  def toSqlStr(airport:Airport):fragment.Fragment={
+    val id = airport.id.list.mkString("")
+    val ident =  airport.airportIdent.list.mkString("")
+    val airportType = airport.airportType.toString
+    val airportName = airport.airportName
+    sql"""INSERT INTO public.airport (id,ident,type,name) VALUES ($id,$ident,$airportType,$airportName)"""
   }
 }
 
