@@ -2,5 +2,6 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/src/main/scala/Main.scala" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/main/scala/fp/utilities/Sql.scala" dialect="GenericSQL" />
   </component>
 </project>

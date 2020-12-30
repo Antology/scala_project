@@ -1,13 +1,11 @@
 package fp.model
-import doobie._
 import doobie.implicits._
-import cats.effect.IO
-import cats.implicits.catsSyntaxTuple2Semigroupal
 import doobie.util.fragment
 import fp.model.Airport.{AirportID, AirportIdent, AirportType}
+import fp.model.Country.CountryCode
 
 
-case class Airport private (id:AirportID,airportIdent:AirportIdent,airportType:AirportType,airportName: String)
+case class Airport private (id:AirportID,airportIdent:AirportIdent,airportType:AirportType,airportName: String,countryCode: CountryCode)
 
 object Airport {
 
@@ -59,9 +57,10 @@ object Airport {
       val airportIdent = AirportIdent.build(strs(1).toList).toOption
       val airportType = AirportType.build(strs(2)).toOption
       val airportName = strs(3)
+      val countryCode = CountryCode.build(strs(8).toList).toOption
 
-      (airportID, airportIdent,airportType,airportName) match {
-        case (Some(id), Some(ident),Some(typ),name) => Right(Airport(id, ident, typ, name))
+      (airportID, airportIdent,airportType,airportName,countryCode) match {
+        case (Some(id), Some(ident),Some(typ),name,Some(iso)) => Right(Airport(id, ident, typ, name, iso))
         case _ => Left("Error")
       }
 
@@ -72,7 +71,8 @@ object Airport {
     val ident =  airport.airportIdent.list.mkString("")
     val airportType = airport.airportType.toString
     val airportName = airport.airportName
-    sql"""INSERT INTO public.airport (id,ident,type,name) VALUES ($id,$ident,$airportType,$airportName)"""
+    val iso = airport.countryCode.list.mkString("")
+    sql"""INSERT INTO public.airport (id,ident,type,name,iso) VALUES ($id,$ident,$airportType,$airportName,$iso)"""
   }
 }
 

@@ -1,4 +1,6 @@
 package fp.model
+import doobie.implicits.toSqlInterpolator
+import doobie.util.fragment
 import fp.model.Country.{CountryCode, CountryID}
 
 case class Country private (id:CountryID,code:CountryCode,name:String)
@@ -30,6 +32,14 @@ object Country {
 
     (countryID, countryCode, countryName) match {
       case (Some(id), Some(ident), name) => Right(Country(id, ident, name))
+      case _ => Left("Error")
     }
+  }
+
+  def toSqlStr(country:Country):fragment.Fragment={
+    val id = country.id.list.mkString("")
+    val code = country.code.list.mkString("")
+    val name = country.name
+    sql"""INSERT INTO public.country (id,code,name) VALUES ($id,$code,$name)"""
   }
 }
