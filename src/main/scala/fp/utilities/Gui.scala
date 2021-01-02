@@ -54,6 +54,7 @@ object Gui {
       contents += QueryButton_1
       contents += QueryButton_2
       contents += textField
+      contents += Button("Return"){Query.this.visible = false;toSelBoard()}
       border = Swing.EmptyBorder(125, 125, 125, 125)
       listenTo(QueryButton_1,QueryButton_2)
       reactions+={
@@ -68,15 +69,16 @@ object Gui {
     title = "AirViewer"
     preferredSize = new Dimension(500, 500)
     val Combox = new ComboBox[String](list)
-    val Button = new Button("Refresh")
-    val Label = new Label(fp.utilities.Sql.GetRunways(fp.utilities.Sql.NameToID(Combox.item)).mkString("\n"))
+    val Button1 = new Button("Refresh")
+    val Label = new Label(fp.utilities.Sql.GetRunways(fp.utilities.Sql.NameToID(Combox.item)).mkString("//"))
     contents = new BoxPanel(Orientation.Vertical) {
       contents += Combox
-      contents += Button
+      contents += Button1
       contents += Label
-      listenTo(Button)
+      contents += Button("Return"){ResultQuery.this.visible = false;toQuery()}
+      listenTo(Button1)
       reactions+={
-        case ButtonClicked(Button)=>{Label.text = fp.utilities.Sql.GetRunways(fp.utilities.Sql.NameToID(Combox.item)).mkString("\n")}
+        case ButtonClicked(Button1)=>{Label.text = fp.utilities.Sql.GetRunways(fp.utilities.Sql.NameToID(Combox.item)).mkString("//")}
       }
       border = Swing.EmptyBorder(125, 125, 125, 125)
     }
@@ -92,6 +94,7 @@ object Gui {
       contents += Airport_nb
       contents += Runway_tp
       contents += Runway_com
+      contents += Button("Return"){Report.this.visible = false;toSelBoard()}
       border = Swing.EmptyBorder(125, 125, 125, 125)
       listenTo(Airport_nb,Runway_tp,Runway_com)
       reactions+={
@@ -107,16 +110,17 @@ object Gui {
     title = "AirViewer"
     preferredSize = new Dimension(500, 500)
     val Combox = new ComboBox[String](List("Highest number of airports","Lowest number of airports"))
-    val Button = new Button("Refresh")
+    val Button1 = new Button("Refresh")
     val Label = new Label(fp.utilities.Sql.SelResultAirportNb(Combox.item))
     contents = new BoxPanel(Orientation.Vertical) {
       border = Swing.EmptyBorder(125, 125, 125, 125)
       contents += Combox
-      contents += Button
+      contents += Button1
       contents += Label
-      listenTo(Button)
+      contents += Button("Return"){ResultAiportNb.this.visible = false;toReport()}
+      listenTo(Button1)
       reactions+={
-        case ButtonClicked(Button) => {Label.text=fp.utilities.Sql.SelResultAirportNb(Combox.item)}
+        case ButtonClicked(Button1) => {Label.text=fp.utilities.Sql.SelResultAirportNb(Combox.item)}
       }
     }
   }
@@ -124,11 +128,32 @@ object Gui {
   class ResultRunwayTp extends MainFrame{
     title = "AirViewer"
     preferredSize = new Dimension(500, 500)
+    val Combox = new ComboBox[String](fp.utilities.Sql.GetCountries())
+    val Button1 = new Button("Refresh")
+    val Label = new Label(fp.utilities.Sql.TypesOfRunways(Combox.item).toString)
+    contents = new BoxPanel(Orientation.Vertical) {
+      contents += Combox
+      contents += Button1
+      contents += Label
+      contents += Button("Return"){ResultRunwayTp.this.visible = false;toReport()}
+      listenTo(Button1)
+      reactions+={
+        case ButtonClicked(Button1)=>{Label.text = fp.utilities.Sql.TypesOfRunways(Combox.item).toString}
+      }
+      border = Swing.EmptyBorder(125, 125, 125, 125)
+    }
   }
+
 
   class ResultRunwayCom extends MainFrame{
     title = "AirViewer"
     preferredSize = new Dimension(500, 500)
+    val Label = new Label(fp.utilities.Sql.CommonRunways().toString())
+
+    contents = new BoxPanel(Orientation.Vertical) {
+      contents += Label
+      contents += Button("Return"){ResultRunwayCom.this.visible = false;toReport()}
+    }
   }
 
 

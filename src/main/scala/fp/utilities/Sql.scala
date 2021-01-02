@@ -16,7 +16,7 @@ object Sql {
     "org.postgresql.Driver", "jdbc:postgresql:project", "postgres", "azer"
   )
 
-  def Create_tables(): Any={
+  def Create_tables(): Any = {
 
     val drop_airport =
       sql"""DROP TABLE IF EXISTS public.airport""".update.run
@@ -50,36 +50,69 @@ object Sql {
     CREATE TABLE public.runway (
       number   SERIAL,
       id   VARCHAR,
-      airport_ref VARCHAR )""".update.run
+      airport_ref VARCHAR,
+      surface VARCHAR,
+      le_ident VARCHAR)""".update.run
 
-    (drop_airport,create_airport).mapN(_+_).transact(xa).unsafeRunSync
-    (drop_country,create_country).mapN(_+_).transact(xa).unsafeRunSync
-    (drop_runway,create_runway).mapN(_+_).transact(xa).unsafeRunSync
+    (drop_airport, create_airport).mapN(_ + _).transact(xa).unsafeRunSync
+    (drop_country, create_country).mapN(_ + _).transact(xa).unsafeRunSync
+    (drop_runway, create_runway).mapN(_ + _).transact(xa).unsafeRunSync
 
   }
 
-  def QuerySearch(string: String):List[String]={sql"""SELECT name FROM public.airport WHERE (iso = $string) """.query[String].to[List].transact(xa).unsafeRunSync}
-  def NameToIso(string: String):String={sql"SELECT code FROM public.country WHERE (name = $string)".query[String].to[List].transact(xa).unsafeRunSync().mkString("")}
-  def NameToID(string:String):String ={sql"SELECT id FROM public.airport WHERE (name = $string)".query[String].to[List].transact(xa).unsafeRunSync().mkString("")}
-  def IDToName(string:String):String ={sql"SELECT name FROM public.airport WHERE (id = $string)".query[String].to[List].transact(xa).unsafeRunSync().mkString("")}
-  def GetRunways(string: String):List[String]={sql"SELECT id FROM public.runway WHERE (airport_ref = $string)".query[String].to[List].transact(xa).unsafeRunSync()}
-  def HighNbAirports():List[(Int,String)]={
-    val countryList:Seq[String] = sql"SELECT code FROM public.country".query[String].to[List].transact(xa).unsafeRunSync()
-    val countList:Seq[Int] = countryList.map(x=>sql"SELECT name FROM public.airport WHERE (iso = $x)".query[String].to[List].transact(xa).unsafeRunSync().size)
-    val temp:Seq[(Int,String)] = countList zip countryList
+  def QuerySearch(string: String): List[String] = {
+    sql"""SELECT name FROM public.airport WHERE (iso = $string) """.query[String].to[List].transact(xa).unsafeRunSync
+  }
+
+  def NameToIso(string: String): String = {
+    sql"SELECT code FROM public.country WHERE (name = $string)".query[String].to[List].transact(xa).unsafeRunSync().mkString("")
+  }
+
+  def NameToID(string: String): String = {
+    sql"SELECT id FROM public.airport WHERE (name = $string)".query[String].to[List].transact(xa).unsafeRunSync().mkString("")
+  }
+
+  def IDToName(string: String): String = {
+    sql"SELECT name FROM public.airport WHERE (id = $string)".query[String].to[List].transact(xa).unsafeRunSync().mkString("")
+  }
+
+  def GetRunways(string: String): List[String] = {
+    sql"SELECT id FROM public.runway WHERE (airport_ref = $string)".query[String].to[List].transact(xa).unsafeRunSync()
+  }
+
+  def GetCountries(): List[String] = {
+    sql"SELECT name FROM public.country".query[String].to[List].transact(xa).unsafeRunSync()
+  }
+
+  def HighNbAirports(): List[(Int, String)] = {
+    val countryList: Seq[String] = sql"SELECT code FROM public.country".query[String].to[List].transact(xa).unsafeRunSync()
+    val countList: Seq[Int] = countryList.map(x => sql"SELECT name FROM public.airport WHERE (iso = $x)".query[String].to[List].transact(xa).unsafeRunSync().size)
+    val temp: Seq[(Int, String)] = countList zip countryList
     temp.sortWith((a, b) => countList.indexOf(a._1) < countList.indexOf(b._1)).reverse.take(10).toList
   }
-  def LowNbAirports():List[(Int,String)]={
-    val countryList:Seq[String] = sql"SELECT code FROM public.country".query[String].to[List].transact(xa).unsafeRunSync()
-    val countList:Seq[Int] = countryList.map(x=>sql"SELECT name FROM public.airport WHERE (iso = $x)".query[String].to[List].transact(xa).unsafeRunSync().size)
-    val temp:Seq[(Int,String)] = countList zip countryList
+
+  def LowNbAirports(): List[(Int, String)] = {
+    val countryList: Seq[String] = sql"SELECT code FROM public.country".query[String].to[List].transact(xa).unsafeRunSync()
+    val countList: Seq[Int] = countryList.map(x => sql"SELECT name FROM public.airport WHERE (iso = $x)".query[String].to[List].transact(xa).unsafeRunSync().size)
+    val temp: Seq[(Int, String)] = countList zip countryList
     temp.sortWith((a, b) => countList.indexOf(a._1) < countList.indexOf(b._1)).take(10).toList
   }
-  def SelResultAirportNb (string: String):String={
+
+  def SelResultAirportNb(string: String): String = {
     string match {
       case "Highest number of airports" => fp.utilities.Sql.HighNbAirports().mkString(" // ")
       case "Lowest number of airports" => fp.utilities.Sql.LowNbAirports().mkString(" // ")
     }
   }
 
+  def TypesOfRunways(country: String):Map[String, Int] = {
+    val code = NameToIso(country)
+    val airports = sql"SELECT id FROM public.airport WHERE (iso = $code)".query[String].to[List].transact(xa).unsafeRunSync()
+    val list = airports.map(x => sql"SELECT surface FROM public.runway WHERE (airport_ref = $x) ".query[String].to[List].transact(xa).unsafeRunSync()).flatten.sorted
+    list.groupMapReduce(identity)(_ => 1)(_ + _)
+  }
+  def CommonRunways():List[(String,Int)]={
+    val ident_list = sql"SELECT le_ident FROM public.runway".query[String].to[List].transact(xa).unsafeRunSync()
+    ident_list.groupMapReduce(identity)(_ => 1)(_ + _).toList.sortBy(_._2).reverse.take(10)
+  }
 }
